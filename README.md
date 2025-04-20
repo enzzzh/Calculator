@@ -1,4 +1,4 @@
-# Calculator in Asm
+# Calculator in ASM
 
 **I don't wanna talk about that project, I made a mistake**
 
