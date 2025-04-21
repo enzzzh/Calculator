@@ -9,6 +9,8 @@ section .data
     result_msg_len equ $ - result_msg
     newline db 10, 0
     buffer db 10, 0 ; Buffer for user input
+    error_msg db "Invalid input. Please enter a single digit (0-9).", 0
+    error_msg_len equ $ - error_msg
 
 section .bss
     a resb 1
@@ -26,6 +28,7 @@ _start:
     call perform_operation
     call print_result
 
+    ; Exit the program
     mov eax, 1
     xor ebx, ebx
     int 0x80
@@ -37,14 +40,7 @@ read_first_number:
     mov edx, prompt_num1_len
     int 0x80
 
-    mov eax, 3
-    mov ebx, 0
-    mov ecx, buffer
-    mov edx, 10
-    int 0x80
-
-    sub byte [buffer], '0' ; Convert ASCII to integer
-    mov al, [buffer]
+    call read_single_digit
     mov [a], al
     ret
 
@@ -55,16 +51,35 @@ read_second_number:
     mov edx, prompt_num2_len
     int 0x80
 
+    call read_single_digit
+    mov [b], al
+    ret
+
+read_single_digit:
     mov eax, 3
     mov ebx, 0
     mov ecx, buffer
     mov edx, 10
     int 0x80
 
+    ; Check if the input is a valid single digit (0-9)
+    cmp byte [buffer], '0'
+    jb invalid_input
+    cmp byte [buffer], '9'
+    ja invalid_input
+
     sub byte [buffer], '0' ; Convert ASCII to integer
     mov al, [buffer]
-    mov [b], al
     ret
+
+invalid_input:
+    ; Print error message
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, error_msg
+    mov edx, error_msg_len
+    int 0x80
+    jmp _start ; Restart the input process
 
 read_operation:
     mov eax, 4
@@ -112,19 +127,35 @@ mul_numbers:
     jmp store_result
 
 div_numbers:
+    cmp bl, 0              ; Check for division by zero
+    je division_by_zero
     xor ah, ah             ; Clear AH for division
     div bl
     jmp store_result
 
+division_by_zero:
+    ; Print error message for division by zero
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, error_msg
+    mov edx, error_msg_len
+    int 0x80
+    jmp _start ; Restart the input process
+
 store_result:
     mov [result], al
+    jmp end_operation
+
+end_operation:
     ret
 
 print_result:
     mov al, [result]
     add al, '0'                  ; Convert to ASCII
+    mov [result], al             ; Store the ASCII character back in result
+
     mov eax, 4
-    mov ebx, 1
+    mov ebx , 1
     mov ecx, result_msg
     mov edx, result_msg_len
     int 0x80
@@ -135,10 +166,10 @@ print_result:
     mov edx, 1
     int 0x80
 
+    ; Print newline
     mov eax, 4
     mov ebx, 1
     mov ecx, newline
     mov edx, 1
     int 0x80
-
     ret
