@@ -22,7 +22,7 @@ cd Calculator
 
 ## 💻 Usage
 
-Once set up, run the neural network by executing:
+Once set up, run the program by executing:
 
 ```bash
 nasm -f elf32 calculator.asm -o calculator.o
