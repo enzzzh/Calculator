@@ -35,6 +35,6 @@ ld -m elf_i386 -s -o calculator calculator.o
 If you have questions or would like to contribute, feel free to reach out!
 
 - **Instagram**: [@enzzz.h](https://instagram.com/enzzz.h)
-- **Email**: [enzzzha@gmail.com](mailto:enzohakim2008@gmail.com)
+- **Email**: [enzohakim@gmail.com](mailto:enzohakim2008@gmail.com)
 
 ---
